@@ -15,13 +15,6 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 	accessToken: API_KEY
 });
 
-
-// Creating base layer that holds both maps
-let baseMaps = {
-	"Streets": streets,
-	"Satellite": satelliteStreets
-};
-
 // Create the map object with center, zoom level and default layer.
 let map = L.map('mapid', {
 	center: [39.5, -98.5],
@@ -29,8 +22,24 @@ let map = L.map('mapid', {
 	layers: [streets]
 });
 
+// Creating base layer that holds both maps
+let baseMaps = {
+	"Streets": streets,
+	"Satellite": satelliteStreets
+};
+
+// Creating earthquake layer for the map
+let earthquakes = new L.layerGroup();
+
+// Defining object that contains the overlays
+let overlays = {
+	Earthquakes: earthquakes
+};
+
+
 // Pass our map layers into our layers control and add the layers control to the map
-L.control.layers(baseMaps).addTo(map);
+L.control.layers(baseMaps, overlays).addTo(map);
+
 
 // Grabbing GeoJSON data
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
@@ -68,6 +77,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 		return "#98ee00";
 	}
 
+
 	function getRadius(magnitude) {
 		if (magnitude === 0) {
 			return 1;
@@ -80,14 +90,49 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 			console.log(data);
 			return L.circleMarker(latlng);
 		},
-		// Setting the style for each circleMarker with styleInfo function
-		style: styleInfo,
-
-		// Creating popup for each circleMarker to display the magnitude and location of the earthquake
+	// Setting the style for each circleMarker with styleInfo function
+	style: styleInfo,
+	// Creating popup for each circleMarker to display the magnitude and location of the earthquake
 		onEachFeature: function(feature, layer) {
 			layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
 		}
-	}).addTo(map);
-});
+	}).addTo(earthquakes);
 
+	// Adding earthquake layer to map
+	earthquakes.addTo(map);
+
+
+	// Create a legend control object
+	let legend = L.control({
+		position: "bottomright"
+	});
+	  
+	//Adding the details for the legend
+	legend.onAdd = function() {
+		let div = L.DomUtil.create("div", "info legend");
+	// };
+
+	// Creating earthquake magnitudes array
+	const magnitudes = [0, 1, 2, 3, 4, 5];
+	const colors = [
+		"#98ee00",
+		"#d4ee00",
+		"#eecc00",
+		"#ee9c00",
+		"#ea2c2c"
+	];
+
+	// Looping through intervals to generate a label with a colored square for each interval
+	for (var i = 0; i < magnitudes.length; i++) {
+		console.log(colors[i]);
+		div.innerHTML +=
+		"<i style= 'background: " + colors[i] + " '></i> " +
+		magnitudes[i] + (magnitudes[i + 1] ? "&ndash;" + magnitudes[i +1] + "<br>" : "+" );
+	}
+	return div;
+};
+
+legend.addTo(map);
+
+});
 
