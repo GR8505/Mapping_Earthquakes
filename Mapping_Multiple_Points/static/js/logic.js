@@ -21,28 +21,6 @@ cityData.forEach(function(city) {
    .addTo(map);
 });
 
-// Adding a marker for Los Angeles, California
-// let marker = L.circle([34.0522, -118.2437]).addTo(map);
-
-// Adding a circle as a marker for LA, California
-// let marker = L.circleMarker([34.0522, -118.2437], {
-// 	color: 'black',
-//     fillColor: '#ffffa1',
-//     fillOpacity: 0.5,
-// 	radius: 100
-// }).addTo(map);
-
-
-
-// // Create the map object with a center and zoom level.
-// let map = L.map("mapid", {
-//     center: [
-//       40.7, -94.5
-//     ],
-//     zoom: 4
-//   });
-
-
 
 // Adding tile layer for the map
 let streets = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
